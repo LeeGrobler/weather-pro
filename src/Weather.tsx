@@ -31,11 +31,14 @@ const Weather = () => {
     const getWeatherData = async () => {
       try {
         const response = await axios.get<WeatherData>(
-          `https://api.openweathermap.org/data/2.5/weather?q={city name}&appid={API key}&units=metric`,
+          `https://api.openweathermap.org/data/2.5/weather?q=rotterdam&appid=${
+            import.meta.env.VITE_OPENWEATHER_API_KEY
+          }&units=metric`,
         )
         setWeatherData(response.data)
         setLoading(false)
       } catch (error) {
+        console.log('error:', error)
         setError(true)
         setLoading(false)
       }
