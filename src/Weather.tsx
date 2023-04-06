@@ -55,7 +55,6 @@ const Weather = () => {
 
   return (
     <div>
-      
 
       <div className="flex flex-col items-center justify-center h-screen bg-gray-200">
         <div className="bg-white rounded-lg p-6 shadow-md w-3/4">
@@ -66,7 +65,6 @@ const Weather = () => {
           {error && <p>Unable to fetch weather data for this location.</p>}
 
           {showWeatherData && (
-            <div className="grid grid-cols-2 gap-4">
               <WeatherItems
                 wind_speed={weatherData?.wind.speed || 0}
                 {...weatherData?.main}
@@ -75,7 +73,6 @@ const Weather = () => {
                 description={weatherData?.weather[0].description || ''}
                 icon={weatherData?.weather[0].icon}
               />
-            </div>
           )}
         </div>
       </div>
