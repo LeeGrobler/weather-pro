@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import axios from 'axios'
+import WeatherItems from './components/WeatherItems'
+import Places from './components/Places'
 
 interface WeatherData {
   name: string
@@ -25,18 +27,20 @@ interface WeatherData {
 const Weather = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [city, setCity] = useState('Rotterdam')
   const [error, setError] = useState(false)
 
   useEffect(() => {
     const getWeatherData = async () => {
       try {
         const response = await axios.get<WeatherData>(
-          `https://api.openweathermap.org/data/2.5/weather?q=rotterdam&appid=${
+          `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${
             import.meta.env.VITE_OPENWEATHER_API_KEY
           }&units=metric`,
         )
         setWeatherData(response.data)
         setLoading(false)
+        setError(false)
       } catch (error) {
         console.log('error:', error)
         setError(true)
@@ -45,48 +49,34 @@ const Weather = () => {
     }
 
     getWeatherData()
-  }, [])
+  }, [city])
 
-  if (loading) {
-    return <p>Loading...</p>
-  }
-
-  if (error) {
-    return <p>Unable to fetch weather data</p>
-  }
-
-  const { name, weather, main, wind } = weatherData!
+  const showWeatherData: boolean = !loading && !error && !!weatherData
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-2">{name}</h1>
-      <div className="flex items-center">
-        <img
-          src={`http://openweathermap.org/img/w/${weather[0].icon}.png`}
-          alt={weather[0].description}
-          className="mr-2 w-16 h-16"
-        />
-        <div>
-          <p className="text-xl">{weather[0].main}</p>
-          <p>{weather[0].description}</p>
-        </div>
-      </div>
-      <div className="grid grid-cols-2 gap-2 mt-4">
-        <div>
-          <p className="font-bold">Temperature</p>
-          <p>{main.temp}&deg;C</p>
-        </div>
-        <div>
-          <p className="font-bold">Feels like</p>
-          <p>{main.feels_like}&deg;C</p>
-        </div>
-        <div>
-          <p className="font-bold">Wind</p>
-          <p>{wind.speed} km/h</p>
-        </div>
-        <div>
-          <p className="font-bold">Humidity</p>
-          <p>{main.humidity}%</p>
+      
+
+      <div className="flex flex-col items-center justify-center h-screen bg-gray-200">
+        <div className="bg-white rounded-lg p-6 shadow-md w-3/4">
+          <Places onChange={e => setCity(e)} value={city}/>
+
+          {loading && <p>Loading...</p>}
+
+          {error && <p>Unable to fetch weather data for this location.</p>}
+
+          {showWeatherData && (
+            <div className="grid grid-cols-2 gap-4">
+              <WeatherItems
+                wind_speed={weatherData?.wind.speed || 0}
+                {...weatherData?.main}
+                name={weatherData?.name || ''}
+                display_name={weatherData?.weather[0].main || ''}
+                description={weatherData?.weather[0].description || ''}
+                icon={weatherData?.weather[0].icon}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>
