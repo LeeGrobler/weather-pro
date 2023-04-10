@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import axios from 'axios'
+// import axios from 'axios'
 import CurrentWeather from './CurrentWeather'
 import Forecast from './Forecast'
 
@@ -45,36 +45,46 @@ const Weather = () => {
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
+  const getWeatherData = async () => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/weather?q=rotterdam&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
+      )
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const data = await response.json()
+
+      setWeatherData(data)
+      setLoading(false)
+    } catch (error) {
+      console.log('error:', error)
+      setError(true)
+      setLoading(false)
+    }
+  }
+
+  const getForecastData = async () => {
+    try {
+      const response = await fetch(
+        `https://api.openweathermap.org/data/2.5/forecast?q=rotterdam&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
+      )
+
+      if (!response.ok) {
+        throw new Error('Network response was not ok')
+      }
+
+      const data = await response.json()
+
+      setForecastData(data)
+    } catch (error) {
+      console.log('error:', error)
+    }
+  }
+
   useEffect(() => {
-    const getWeatherData = async () => {
-      try {
-        const response = await axios.get<WeatherData>(
-          `https://api.openweathermap.org/data/2.5/weather?q=rotterdam&appid=${
-            import.meta.env.VITE_OPENWEATHER_API_KEY
-          }&units=metric`,
-        )
-        setWeatherData(response.data)
-        setLoading(false)
-      } catch (error) {
-        console.log('error:', error)
-        setError(true)
-        setLoading(false)
-      }
-    }
-
-    const getForecastData = async () => {
-      try {
-        const response = await axios.get<ForecastData>(
-          `https://api.openweathermap.org/data/2.5/forecast?q=rotterdam&appid=${
-            import.meta.env.VITE_OPENWEATHER_API_KEY
-          }&units=metric`,
-        )
-        setForecastData(response.data)
-      } catch (error) {
-        console.log('error:', error)
-      }
-    }
-
     getWeatherData()
     getForecastData()
   }, [])
@@ -92,6 +102,7 @@ const Weather = () => {
 
   return (
     <div>
+      <h1 className="text-xl mb-4 uppercase text-gray-300">Weather Pro</h1>
       <h1 className="text-3xl font-bold mb-2">{name}</h1>
       <CurrentWeather
         weather={{
