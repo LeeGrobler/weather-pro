@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 // import axios from 'axios'
 import CurrentWeather from './CurrentWeather'
 import Forecast from './Forecast'
+import Places from './Places'
 
 interface WeatherData {
   name: string
@@ -44,7 +45,10 @@ const Weather = () => {
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
   const [forecastData, setForecastData] = useState<ForecastData | null>(null)
   const [loading, setLoading] = useState(true)
+  const [city, setCity] = useState('Amsterdam')
   const [error, setError] = useState(false)
+  const onCityChange = (e: React.ChangeEvent<HTMLInputElement>) => setCity(e.target.value)
+  const [debouncedValue, setDebouncedValue] = useState(city)
 
   const getCurrentLocation = async () => {
     return new Promise<string>((resolve, reject) => {
@@ -67,7 +71,8 @@ const Weather = () => {
               (component: { types: string[] }) => component.types.includes('locality'),
             )?.long_name
 
-            return resolve(city.toLowerCase())
+            setCity(city)
+            return resolve(city)
           },
           err => {
             console.log('err:', err)
@@ -81,7 +86,7 @@ const Weather = () => {
     })
   }
 
-  const getWeatherData = async (city: string) => {
+  const getWeatherData = useCallback(async () => {
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
@@ -100,9 +105,9 @@ const Weather = () => {
       setError(true)
       setLoading(false)
     }
-  }
+  }, [city])
 
-  const getForecastData = async (city: string) => {
+  const getForecastData = useCallback(async () => {
     try {
       const response = await fetch(
         `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
@@ -118,17 +123,27 @@ const Weather = () => {
     } catch (err) {
       console.log('err:', err)
     }
-  }
+  }, [city])
 
   useEffect(() => {
-    const initialise = async () => {
-      const city = await getCurrentLocation()
-      getWeatherData(city)
-      getForecastData(city)
+    getCurrentLocation()
+  }, [])
+
+  useEffect(() => {
+    const timer = setTimeout(() => setDebouncedValue(city), 500)
+    return () => clearTimeout(timer)
+  }, [city])
+
+  useEffect(() => {
+    const controller = new AbortController()
+
+    if (debouncedValue) {
+      getWeatherData()
+      getForecastData()
     }
 
-    initialise()
-  }, [])
+    return () => controller.abort()
+  }, [debouncedValue, getWeatherData, getForecastData])
 
   if (loading) {
     return <p>Loading...</p>
@@ -138,22 +153,22 @@ const Weather = () => {
     return <p>Unable to fetch weather data</p>
   }
 
-  const { name, weather, main, wind } = weatherData!
+  const { name, weather = [], main, wind } = weatherData!
   const forecastList = forecastData?.list || []
 
   return (
     <div>
-      <h1 className="text-xl mb-4 uppercase text-gray-300">Weather Pro</h1>
+      <Places onChange={onCityChange} value={city} />
       <h1 className="text-3xl font-bold mb-2">{name}</h1>
       <CurrentWeather
         weather={{
-          temperature: main.temp,
-          description_main: weather[0].main,
-          description_detailed: weather[0].description,
+          temperature: main?.temp,
+          description_main: weather[0]?.main,
+          description_detailed: weather[0]?.description,
           icon: weather[0].icon,
-          feels_like: main.feels_like,
+          feels_like: main?.feels_like,
           wind_speed: wind.speed,
-          humidity: main.humidity,
+          humidity: main?.humidity,
         }}
       />
 
