@@ -12,8 +12,8 @@ describe('Weather', () => {
   it('renders weather data', async () => {
     render(<Weather />)
 
-    await screen.findByText(/rotterdam/i, {}, { timeout: 5000 })
-    const weatherElement = screen.getByText(/rotterdam/i)
+    await screen.findByText(/amsterdam/i, {}, { timeout: 5000 })
+    const weatherElement = screen.getByText(/amsterdam/i)
     expect(weatherElement).toBeInTheDocument()
   })
 

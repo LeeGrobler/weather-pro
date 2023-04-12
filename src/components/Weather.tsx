@@ -40,18 +40,54 @@ interface ForecastData {
 }
 
 const Weather = () => {
+  // const [city, setCity] = useState<string>('amsterdam')
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
   const [forecastData, setForecastData] = useState<ForecastData | null>(null)
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(false)
 
-  const getWeatherData = async () => {
+  const getCurrentLocation = async () => {
+    return new Promise<string>((resolve, reject) => {
+      if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(
+          async res => {
+            const { latitude: lat, longitude: lon } = res.coords
+
+            const response = await fetch(
+              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${process.env.REACT_APP_GOOGLEMAPS_API_KEY}`,
+            )
+
+            if (!response?.ok) {
+              throw new Error('Network response was not ok')
+            }
+
+            const data = await response.json()
+
+            const city = data.results[0]?.address_components.find(
+              (component: { types: string[] }) => component.types.includes('locality'),
+            )?.long_name
+
+            return resolve(city.toLowerCase())
+          },
+          err => {
+            console.log('err:', err)
+            return resolve('amsterdam')
+          },
+        )
+      } else {
+        console.log('Geolocation is not supported by this browser.')
+        return resolve('amsterdam')
+      }
+    })
+  }
+
+  const getWeatherData = async (city: string) => {
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=rotterdam&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
+        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
       )
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Network response was not ok')
       }
 
@@ -59,34 +95,39 @@ const Weather = () => {
 
       setWeatherData(data)
       setLoading(false)
-    } catch (error) {
-      console.log('error:', error)
+    } catch (err) {
+      console.log('err:', err)
       setError(true)
       setLoading(false)
     }
   }
 
-  const getForecastData = async () => {
+  const getForecastData = async (city: string) => {
     try {
       const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?q=rotterdam&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
+        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
       )
 
-      if (!response.ok) {
+      if (!response?.ok) {
         throw new Error('Network response was not ok')
       }
 
       const data = await response.json()
 
       setForecastData(data)
-    } catch (error) {
-      console.log('error:', error)
+    } catch (err) {
+      console.log('err:', err)
     }
   }
 
   useEffect(() => {
-    getWeatherData()
-    getForecastData()
+    const initialise = async () => {
+      const city = await getCurrentLocation()
+      getWeatherData(city)
+      getForecastData(city)
+    }
+
+    initialise()
   }, [])
 
   if (loading) {
