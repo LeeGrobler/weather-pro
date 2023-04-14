@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
-// import axios from 'axios'
 import CurrentWeather from './CurrentWeather'
 import Forecast from './Forecast'
 import Places from './Places'
+import { getCityWeatherData, getCityForecastData } from '../api/weather'
+import { getCurrentLocation } from '../api/location'
 
 interface WeatherData {
   name: string
@@ -41,65 +42,23 @@ interface ForecastData {
 }
 
 const Weather = () => {
-  // const [city, setCity] = useState<string>('amsterdam')
   const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
   const [forecastData, setForecastData] = useState<ForecastData | null>(null)
-  const [loading, setLoading] = useState(true)
-  const [city, setCity] = useState('Amsterdam')
+  const [loading, setLoading] = useState<boolean>(true)
   const [error, setError] = useState(false)
-  const onCityChange = (e: React.ChangeEvent<HTMLInputElement>) => setCity(e.target.value)
+  const [city, setCity] = useState<string>()
   const [debouncedValue, setDebouncedValue] = useState(city)
 
-  const getCurrentLocation = async () => {
-    return new Promise<string>((resolve, reject) => {
-      if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(
-          async res => {
-            const { latitude: lat, longitude: lon } = res.coords
-
-            const response = await fetch(
-              `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lon}&key=${process.env.REACT_APP_GOOGLEMAPS_API_KEY}`,
-            )
-
-            if (!response?.ok) {
-              throw new Error('Network response was not ok')
-            }
-
-            const data = await response.json()
-
-            const city = data.results[0]?.address_components.find(
-              (component: { types: string[] }) => component.types.includes('locality'),
-            )?.long_name
-
-            setCity(city)
-            return resolve(city)
-          },
-          err => {
-            console.log('err:', err)
-            return resolve('amsterdam')
-          },
-        )
-      } else {
-        console.log('Geolocation is not supported by this browser.')
-        return resolve('amsterdam')
-      }
-    })
-  }
+  const onCityChange = (e: React.ChangeEvent<HTMLInputElement>) => setCity(e?.target?.value  || '')
 
   const getWeatherData = useCallback(async () => {
+    if(!city) return
     try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
-      )
-
-      if (!response?.ok) {
-        throw new Error('Network response was not ok')
-      }
-
-      const data = await response.json()
+      const data = await getCityWeatherData(city)
 
       setWeatherData(data)
       setLoading(false)
+      setError(false)
     } catch (err) {
       console.log('err:', err)
       setError(true)
@@ -108,25 +67,27 @@ const Weather = () => {
   }, [city])
 
   const getForecastData = useCallback(async () => {
+    if(!city) return
+
     try {
-      const response = await fetch(
-        `https://api.openweathermap.org/data/2.5/forecast?q=${city}&appid=${process.env.REACT_APP_OPENWEATHER_API_KEY}&units=metric`,
-      )
-
-      if (!response?.ok) {
-        throw new Error('Network response was not ok')
-      }
-
-      const data = await response.json()
-
+      const data = await getCityForecastData(city)
       setForecastData(data)
     } catch (err) {
       console.log('err:', err)
     }
   }, [city])
 
+  const getUserLocation = async () => {
+    if(city) return
+    try {
+      const data = await getCurrentLocation()
+      setCity(data)
+    } catch (err) {
+      console.log('err:', err)
+    }
+  }
   useEffect(() => {
-    getCurrentLocation()
+    getUserLocation()
   }, [])
 
   useEffect(() => {
@@ -145,34 +106,28 @@ const Weather = () => {
     return () => controller.abort()
   }, [debouncedValue, getWeatherData, getForecastData])
 
-  if (loading) {
-    return <p>Loading...</p>
-  }
-
-  if (error) {
-    return <p>Unable to fetch weather data</p>
-  }
-
-  const { name, weather = [], main, wind } = weatherData!
   const forecastList = forecastData?.list || []
 
   return (
     <div>
-      <Places onChange={onCityChange} value={city} />
-      <h1 className="text-3xl font-bold mb-2">{name}</h1>
-      <CurrentWeather
+      <Places onChange={onCityChange} value={city}  placeholder={loading? 'Searching current location...':''}/>
+      <h1 className="text-3xl font-bold mb-2">{loading ? 'Loading...' : weatherData?.name}</h1>
+      <h6 className="text-3xl font-bold mb-2">{error && 'Unable to fetch weather data!'}</h6>
+     {!loading && city && <>
+     <CurrentWeather
         weather={{
-          temperature: main?.temp,
-          description_main: weather[0]?.main,
-          description_detailed: weather[0]?.description,
-          icon: weather[0].icon,
-          feels_like: main?.feels_like,
-          wind_speed: wind.speed,
-          humidity: main?.humidity,
+          temperature: weatherData?.main?.temp || 0,
+          description_main: weatherData?.weather[0]?.main || '',
+          description_detailed: weatherData?.weather[0]?.description || '',
+          icon: weatherData?.weather[0].icon || '',
+          feels_like: weatherData?.main?.feels_like || 0,
+          wind_speed: weatherData?.wind?.speed || 0,
+          humidity: weatherData?.main?.humidity || 0,
         }}
       />
 
       <Forecast forecast={forecastList} />
+      </> }
     </div>
   )
 }
