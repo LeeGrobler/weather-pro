@@ -1,6 +1,7 @@
 import React from 'react'
 
 type ForecastProps = {
+  isLoading: boolean,
   forecast: {
     dt_txt: string
     main: {
@@ -15,9 +16,10 @@ type ForecastProps = {
   }[]
 }
 
-const Forecast = ({ forecast }: ForecastProps) => {
+const Forecast = ({isLoading,  forecast }: ForecastProps) => {
   const [showForecast, setShowForecast] = React.useState(false)
 
+  if (isLoading) return null
   return (
     <>
       <button
