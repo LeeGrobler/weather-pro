@@ -1,8 +1,9 @@
 import React, { useState, useEffect, useCallback } from 'react'
+import { useQuery, useQueries } from '@tanstack/react-query'
 import CurrentWeather from './CurrentWeather'
 import Forecast from './Forecast'
 import Places from './Places'
-import { getCityWeatherData, getCityForecastData } from '../api/weather'
+import { fetchWeather, fetchForecast } from '../api/weather'
 import { getCurrentLocation } from '../api/location'
 
 interface WeatherData {
@@ -41,44 +42,32 @@ interface ForecastData {
   }[]
 }
 
-const Weather = () => {
-  const [weatherData, setWeatherData] = useState<WeatherData | null>(null)
-  const [forecastData, setForecastData] = useState<ForecastData | null>(null)
-  const [loading, setLoading] = useState<boolean>(true)
-  const [error, setError] = useState(false)
+const Weather = () => { 
+ 
   const [city, setCity] = useState<string>()
   const [debouncedValue, setDebouncedValue] = useState(city)
 
-  const onCityChange = (e: React.ChangeEvent<HTMLInputElement>) => setCity(e?.target?.value  || '')
+  const onCityChange = (e: React.ChangeEvent<HTMLInputElement>) => setCity(e?.target?.value || '')
 
-  const getWeatherData = useCallback(async () => {
-    if(!city) return
-    try {
-      const data = await getCityWeatherData(city)
+  const [weather, forecast] = useQueries({
+    queries: [
+      {
+        queryKey: ['weather', debouncedValue],
+        queryFn: () => fetchWeather(city),
+        enabled: !!city,
+      },
+      {
+        queryKey: ['forecast', debouncedValue],
+        queryFn: () => fetchForecast(city),
+        enabled: !!city,
+      },
+    ],
+  })
 
-      setWeatherData(data)
-      setLoading(false)
-      setError(false)
-    } catch (err) {
-      console.log('err:', err)
-      setError(true)
-      setLoading(false)
-    }
-  }, [city])
 
-  const getForecastData = useCallback(async () => {
-    if(!city) return
-
-    try {
-      const data = await getCityForecastData(city)
-      setForecastData(data)
-    } catch (err) {
-      console.log('err:', err)
-    }
-  }, [city])
 
   const getUserLocation = async () => {
-    if(city) return
+    if (city) return
     try {
       const data = await getCurrentLocation()
       setCity(data)
@@ -86,34 +75,28 @@ const Weather = () => {
       console.log('err:', err)
     }
   }
+
   useEffect(() => {
     getUserLocation()
   }, [])
-
+// used for debouncing on search
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedValue(city), 500)
     return () => clearTimeout(timer)
   }, [city])
 
-  useEffect(() => {
-    const controller = new AbortController()
-
-    if (debouncedValue) {
-      getWeatherData()
-      getForecastData()
-    }
-
-    return () => controller.abort()
-  }, [debouncedValue, getWeatherData, getForecastData])
-
-  const forecastList = forecastData?.list || []
-
+  const weatherData = weather?.data
+  const forecastList = forecast.data?.list || []
   return (
     <div>
-      <Places onChange={onCityChange} value={city}  placeholder={loading? 'Searching current location...':''}/>
-      <h1 className="text-3xl font-bold mb-2">{loading ? 'Loading...' : weatherData?.name}</h1>
-      <h6 className="text-3xl font-bold mb-2">{error && 'Unable to fetch weather data!'}</h6>
-     {!loading && city && <>
+      <Places
+        onChange={onCityChange}
+        value={city}
+        placeholder={weather.isLoading  ? 'Searching current location...' : ''}
+      />
+      <h1 className="text-3xl font-bold mb-2">{weather.isLoading ? 'Loading...' : weatherData?.name}</h1>
+      {weather.isError && <h6 className="text-3xl font-bold mb-2">'Unable to fetch weather data!</h6>}
+      { city && <>
      <CurrentWeather
         weather={{
           temperature: weatherData?.main?.temp || 0,
@@ -124,9 +107,10 @@ const Weather = () => {
           wind_speed: weatherData?.wind?.speed || 0,
           humidity: weatherData?.main?.humidity || 0,
         }}
+        isLoading={weather?.isLoading || false}
       />
 
-      <Forecast forecast={forecastList} />
+      <Forecast forecast={forecastList} isLoading={forecast.isLoading} />
       </> }
     </div>
   )

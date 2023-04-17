@@ -9,10 +9,11 @@ type CurrentWeatherProps = {
     feels_like: number
     humidity: number
     icon: string
-  }
+  }, 
+  isLoading: boolean
 }
 
-const CurrentWeather = ({ weather }: CurrentWeatherProps) => {
+const CurrentWeather = ({ weather , isLoading}: CurrentWeatherProps) => {
   const {
     description_main,
     description_detailed,
@@ -22,6 +23,7 @@ const CurrentWeather = ({ weather }: CurrentWeatherProps) => {
     humidity,
     icon,
   } = weather
+  if (isLoading) return null
 
   return (
     <>
