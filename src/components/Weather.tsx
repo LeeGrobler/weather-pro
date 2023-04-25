@@ -63,11 +63,15 @@ const Weather = () => {
         queryKey: ['weather', debouncedValue],
         queryFn: () => fetchWeather(city),
         enabled: !!city,
+        refetchOnWindowFocus:true
+        //  todo: add select function for data transformation
       },
       {
         queryKey: ['forecast', debouncedValue],
         queryFn: () => fetchForecast(city),
         enabled: !!city,
+        refetchOnWindowFocus:true
+
       },
     ],
   })

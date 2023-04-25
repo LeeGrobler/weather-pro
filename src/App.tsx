@@ -3,6 +3,7 @@ import {
   QueryClient,
   QueryClientProvider,
 } from '@tanstack/react-query'
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools'
 
 const queryClient = new QueryClient()
 const App = () => {
@@ -12,6 +13,7 @@ const App = () => {
         <h1 className="mb-8 uppercase text-gray-400">Weather App Pro</h1>
         <Weather />
       </div>
+      <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   )
 }
