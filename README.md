@@ -23,7 +23,7 @@ Before you begin, you will need to obtain API keys for the following services:
 1. Clone this repository:
 
 ```
-git clone https://github.com/yourusername/weather-app.git
+git clone https://github.com/SeriousLeeTV/weather-pro.git
 ```
 
 2. Install the dependencies:
