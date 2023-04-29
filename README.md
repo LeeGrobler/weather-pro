@@ -1,53 +1,59 @@
 # Weather App
 
-This is a weather app that displays the user's local weather data and the forecast for the rest of the week. It uses the OpenWeatherMap API to retrieve weather data.
+This Weather App allows users to search for the current weather and forecasts for a specific city. It utilizes the OpenWeatherMap API and Google Maps API to fetch the weather data and provide location suggestions.
 
-## Getting Started
+## Prerequisites
 
-To get started with this project, follow these steps:
+Before you begin, you will need to obtain API keys for the following services:
 
-1. Clone this repository to your local machine:
+1. OpenWeatherMap API: Sign up for a free account at https://home.openweathermap.org/users/sign_up. After signing up, you will receive an API key. You can find your API key by navigating to the API keys section in your account.
+
+2. Google Maps API: To get an API key for Google Maps, follow these steps:
+
+- Go to the Google Cloud Platform Console.
+- Create a new project or select an existing one.
+- Click on the hamburger menu in the top left corner and navigate to APIs & Services > Dashboard.
+- Click on the "+ ENABLE APIS AND SERVICES" button at the top of the page.
+- Search for "Maps JavaScript API" and click on it, then click the "Enable" button.
+- After enabling the API, navigate to APIs & Services > Credentials.
+- Click on the "CREATE CREDENTIALS" button and select "API key". A new API key will be generated.
+
+## Setup
+
+1. Clone this repository:
 
 ```
-git clone https://github.com/your-username/weather-app.git
+git clone https://github.com/yourusername/weather-app.git
 ```
 
-2. Install the dependencies by running the following command in the project directory:
+2. Install the dependencies:
 
 ```
+cd weather-app
 npm install
 ```
 
-3. Create a new .env file in the project directory and add your OpenWeatherMap API key to it:
+3. Create a .env file in the root directory of the project and add your API keys:
 
 ```
-REACT_APP_OPENWEATHER_API_KEY=your-api-key-goes-here
+VITE_OPENWEATHER_API_KEY=your_openweathermap_api_key
+VITE_GOOGLEMAPS_API_KEY=your_google_maps_api_key
 ```
 
-Replace `your-api-key-goes-here` with your actual API key. If you don't have an API key yet, see the next section for instructions on how to obtain one.
-
-4. Start the development server by running the following command in the project directory:
+4. Run the app in development mode:
 
 ```
-npm start
+npm run dev
 ```
 
-This will start the development server and open the app in your default browser.
+5. Open http://localhost:3000 to view the app in your browser.
 
-## Obtaining an OpenWeatherMap API Key
+## Features
 
-To use the OpenWeatherMap API, you need to obtain an API key. Here's how to do it:
+- Search for a city to get the current weather and forecast
+- Autocomplete suggestions using Google Maps API
+- Responsive design for mobile and desktop devices
 
-1. Go to the OpenWeatherMap website and sign up for a free account.
+## License
 
-2. Once you've signed up, go to the API Keys page and create a new API key. You should see a long string of characters and numbers that looks something like this: `4f7d473dd50e21c7f3d5993f08e38e49`.
-
-3. Copy the API key and add it to your .env file like this:
-
-```
-REACT_APP_OPENWEATHER_API_KEY=your-api-key-goes-here
-```
-
-Remember to replace your-api-key-goes-here with the actual API key that you obtained from OpenWeatherMap.
-
-That's it! You should now be able to run the app and retrieve weather data from the OpenWeatherMap API. If you encounter any issues, please refer to the Vite documentation or consult the Troubleshooting section on the OpenWeatherMap website.
+This project is licensed under the MIT License.
