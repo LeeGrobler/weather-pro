@@ -23,7 +23,6 @@ const Alert = () => {
   return (
     <>
       <div className="App">
-        <h1>Alert Popup Example</h1>
         <div className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${getColor()}`}>
           {alert.message}
         </div>
