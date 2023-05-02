@@ -43,7 +43,7 @@ const App = () => {
       }}
     >
       <Spinner />
-      <main className="p-4 flex flex-col gap-8 md:max-w-md mx-auto backdrop-blur-md rounded-3xl">
+      <main className="p-4 flex flex-col gap-8 md:max-w-md mx-auto backdrop-blur-md rounded-3xl w-full">
         <Location />
         <Weather city={city} />
       </main>
