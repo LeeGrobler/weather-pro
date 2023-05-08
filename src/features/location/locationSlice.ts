@@ -1,9 +1,10 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit'
 
-import { setLoading, showAlert, hideAlert } from '../shared/commonSlice'
+import { setLoading } from '../shared/commonSlice'
 import Coordinates from '../../models/Coordinates'
 import LocationState from '../../models/LocationState'
 import FetchCityResponse from '../../models/FetchCityResponse'
+import { alert } from '../../app/utils'
 
 const initialState: LocationState = {
   coordinates: undefined,
@@ -24,10 +25,8 @@ export const fetchCoordinates = createAsyncThunk(
           })
         },
         err => {
-          // TODO: extract show and hide alert to a helper function
           dispatch(setLoading(false))
-          dispatch(showAlert({ message: err.message }))
-          setTimeout(() => dispatch(hideAlert()), 10000)
+          alert(dispatch, err.message)
           reject(err)
         },
         { enableHighAccuracy: true, timeout: 20000, maximumAge: 1000 },
@@ -54,16 +53,14 @@ export const fetchCity = createAsyncThunk(
     const data: FetchCityResponse = await response.json()
 
     if (!data.results?.length) {
-      dispatch(showAlert({ message: data.error_message || 'Unable to retrieve location data' }))
-      setTimeout(() => dispatch(hideAlert()), 10000)
+      alert(dispatch, data.error_message || 'Unable to retrieve location data')
       throw new Error()
     }
 
     const city = data.results[0].address_components.find(v => v.types.includes('locality'))
 
     if (!city) {
-      dispatch(showAlert({ message: 'Unable to retrieve city name' }))
-      setTimeout(() => dispatch(hideAlert()), 10000)
+      alert(dispatch, 'Unable to retrieve city name')
       throw new Error()
     }
 

@@ -1,9 +1,10 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
 
-import { setLoading, showAlert, hideAlert } from '../shared/commonSlice'
+import { setLoading } from '../shared/commonSlice'
 import Weather from '../../models/Weather'
 import Forecast from '../../models/Forecast'
 import WeatherState from '../../models/WeatherState'
+import { alert } from '../../app/utils'
 
 const initialState: WeatherState = {
   weather: undefined,
@@ -25,8 +26,7 @@ export const fetchWeather = createAsyncThunk(
     const data: Weather = await response.json()
 
     if (data.cod !== 200) {
-      dispatch(showAlert({ message: data.message || 'Unable to retrieve weather data' }))
-      setTimeout(() => dispatch(hideAlert()), 10000)
+      alert(dispatch, data.message || 'Unable to retrieve weather data')
       throw new Error()
     }
 
@@ -49,8 +49,7 @@ export const fetchForecast = createAsyncThunk(
     const data: Forecast = await response.json()
 
     if (data.cod !== '200') {
-      dispatch(showAlert({ message: data.message || 'Unable to retrieve forecast data' }))
-      setTimeout(() => dispatch(hideAlert()), 10000)
+      alert(dispatch, data.message || 'Unable to retrieve forecast data')
       throw new Error()
     }
 
