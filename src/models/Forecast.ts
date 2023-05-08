@@ -2,35 +2,35 @@ export interface ForecastListItem {
   dt: number
   main: {
     temp: number
-    feels_like: number
-    temp_min: number
-    temp_max: number
-    pressure: number
-    sea_level: number
-    grnd_level: number
     humidity: number
-    temp_kf: number
+    feels_like?: number
+    temp_min?: number
+    temp_max?: number
+    pressure?: number
+    sea_level?: number
+    grnd_level?: number
+    temp_kf?: number
   }
   weather: {
-    id: number
-    main: string
-    description: string
     icon: string
+    description: string
+    id?: number
+    main?: string
   }[]
-  clouds: {
+  clouds?: {
     all: number
   }
-  wind: {
+  wind?: {
     speed: number
     deg: number
     gust: number
   }
-  visibility: number
-  pop: number
-  sys: {
+  visibility?: number
+  pop?: number
+  sys?: {
     pod: string
   }
-  dt_txt: string
+  dt_txt?: string
 }
 
 export default interface Forecast {

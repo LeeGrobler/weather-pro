@@ -21,13 +21,9 @@ const Alert = () => {
   }
 
   return (
-    <>
-      <div className="App">
-        <div className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${getColor()}`}>
-          {alert.message}
-        </div>
-      </div>
-    </>
+    <div className={`fixed bottom-4 right-4 p-4 rounded-md shadow-lg ${getColor()}`}>
+      {alert.message}
+    </div>
   )
 }
 

@@ -9,6 +9,7 @@ function Spinner() {
     <div
       className="fixed inset-0 z-50 flex items-center justify-center"
       style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)' }}
+      data-testid="spinner"
     >
       <div className="bg-white p-4 rounded-lg">
         <div className="w-16 h-16 border-t-4 border-blue-500 border-solid rounded-full animate-spin"></div>

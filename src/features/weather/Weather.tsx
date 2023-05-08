@@ -16,7 +16,7 @@ const Weather = ({ city }: Props) => {
   const humidity = weather?.main.humidity.toString()
 
   return (
-    <>
+    <div className="flex flex-col gap-8" data-testid="weather">
       {city && iconUrl && description && temp && humidity && (
         <Current
           city={city}
@@ -28,7 +28,7 @@ const Weather = ({ city }: Props) => {
       )}
 
       {forecast?.list && <Forecast forecast={forecast.list} />}
-    </>
+    </div>
   )
 }
 

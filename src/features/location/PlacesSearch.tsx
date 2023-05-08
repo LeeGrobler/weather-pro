@@ -59,7 +59,7 @@ const PlacesSearch = ({ onPlaceSelected, placeholder, value }: Props) => {
   }, [onPlaceSelected, googleLoaded])
 
   return (
-    <div className="relative w-full">
+    <div className="relative w-full" data-testid="location">
       <input
         className="w-full p-4 py-3 text-gray-700 bg-white border border-gray-300 rounded-full focus:outline-none focus:border-blue-500"
         type="text"

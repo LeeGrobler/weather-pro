@@ -18,7 +18,9 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noImplicitAny": true
+    "noImplicitAny": true,
+
+    "types": ["vitest/globals", "googlemaps"]
   },
   "include": ["src"],
   "references": [{ "path": "./tsconfig.node.json" }]
