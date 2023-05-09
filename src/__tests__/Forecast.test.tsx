@@ -36,7 +36,7 @@ describe('Forecast', () => {
   it('renders the component with the provided data', () => {
     render(<Forecast forecast={forecastData} />)
 
-    forecastData.forEach((item, index) => {
+    forecastData.forEach(item => {
       const iconUrl = `http://openweathermap.org/img/w/${item.weather[0].icon}.png`
       const description = item.weather[0].description
       const temp = item.main.temp.toFixed(0)
