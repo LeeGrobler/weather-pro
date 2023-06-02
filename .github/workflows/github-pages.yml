@@ -3,6 +3,9 @@ name: Build and Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+env:
+  VITE_OPENWEATHER_API_KEY: ${{ secrets.VITE_OPENWEATHER_API_KEY }}
+  VITE_GOOGLEMAPS_API_KEY: ${{ secrets.VITE_GOOGLEMAPS_API_KEY }}
 jobs:
   build-push-gcr:
     name: Build and Deploy
@@ -24,6 +27,3 @@ jobs:
           git config --global user.email 'seriouslee131@gmail.com'
           git remote set-url origin https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}    
           npm run deploy
-        env:
-          VITE_OPENWEATHER_API_KEY: ${{ secrets.VITE_OPENWEATHER_API_KEY }}
-          VITE_GOOGLEMAPS_API_KEY: ${{ secrets.VITE_GOOGLEMAPS_API_KEY }}
