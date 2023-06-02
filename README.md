@@ -2,6 +2,10 @@
 
 This Weather App allows users to search for the current weather and forecasts for a specific city. It utilizes the OpenWeatherMap API and Google Maps API to fetch the weather data and provide location suggestions.
 
+## Live Demo
+
+You can test the live application by visiting https://leegrobler.github.io/weather-pro.
+
 ## Prerequisites
 
 Before you begin, you will need to obtain API keys for the following services:
