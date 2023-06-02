@@ -48,6 +48,28 @@ const App = () => {
         <Weather city={city} />
       </main>
       <Alert />
+
+      <footer className="text-center text-gray-100 text-md mt-4 absolute bottom-2 left-2">
+        By{' '}
+        <a
+          href="https://lee-grobler.com"
+          className="text-gray-50 hover:text-gray-100"
+          target="_blank"
+        >
+          Lee Grobler
+        </a>
+        <span className="text-gray-100 mx-1">•</span>
+        <a
+          href="https://github.com/LeeGrobler/weather-pro"
+          className="text-gray-50 hover:text-gray-100"
+          target="_blank"
+        >
+          GitHub
+        </a>
+        <span className="text-gray-100 mx-1">•</span>
+        {/* current year */}
+        {new Date().getFullYear()}
+      </footer>
     </div>
   )
 }
